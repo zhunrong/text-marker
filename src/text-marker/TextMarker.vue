@@ -16,9 +16,9 @@
 <script lang="ts">
 import { Vue, Component, Prop, Ref } from "vue-property-decorator";
 import TextSelection, { TextRange } from "./selection";
-import { Icon } from "ant-design-vue";
 import Popover from "./Popover.vue";
 import Dropdown from "./Dropdown.vue";
+import Icon from "./Icon.vue";
 
 const COLORS = [
   "#607AE3",
@@ -209,7 +209,7 @@ export default class TextMarker extends Vue {
     align-items: center;
     line-height: 16px;
     height: 22px;
-    .anticon-plus {
+    .icon-plus {
       margin-right: 6px;
       height: 14px;
     }
@@ -222,7 +222,7 @@ export default class TextMarker extends Vue {
     align-items: center;
     line-height: 16px;
     height: 22px;
-    .anticon-close {
+    .icon-close {
       margin-left: 6px;
       cursor: pointer;
       height: 14px;
