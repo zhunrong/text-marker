@@ -1,22 +1,14 @@
 <template>
   <div class="text-mark">
     <p ref="paragraph" class="paragraph"></p>
-    <div
-      ref="popover"
-      class="popover"
-      :style="{ backgroundColor: popoverColor }"
-      @mouseup.stop
-    >
-      <div class="content">
-        <div v-if="popoverType === 'add'" class="add-mark" @click="addMark">
-          <Icon type="plus" />添加标注
-        </div>
-        <div v-if="popoverType === 'remove'" class="remove-mark">
-          {{ popoverText }} <Icon @click="removeMark" type="close" />
-        </div>
+    <Popover v-bind="popover">
+      <div v-if="popoverType === 'add'" class="add-mark" @click="addMark">
+        <Icon type="plus" />添加标注
       </div>
-      <i class="arrow" :style="{ borderTopColor: popoverColor }"></i>
-    </div>
+      <div v-if="popoverType === 'remove'" class="remove-mark">
+        {{ popoverText }} <Icon @click="removeMark" type="close" />
+      </div>
+    </Popover>
     <div ref="dropdown" class="dropdown-menu" @mouseup.stop>
       <ul>
         <li
@@ -35,6 +27,7 @@
 <script>
 import TextSelection from "./selection";
 import { Icon } from "ant-design-vue";
+import Popover from "./Popover.vue";
 
 const COLORS = [
   "#607AE3",
@@ -47,6 +40,7 @@ const COLORS = [
 
 export default {
   components: {
+    Popover,
     Icon,
   },
   props: {
@@ -71,7 +65,12 @@ export default {
     return {
       popoverType: "add",
       popoverText: "",
-      popoverColor: "#fff",
+      popover: {
+        visible: false,
+        color: "",
+        left: 0,
+        top: 0,
+      },
     };
   },
   mounted() {
@@ -90,23 +89,25 @@ export default {
     document.removeEventListener("mouseup", this.onDocClick);
   },
   methods: {
-    onRangeInsert({ range }) {
+    async onRangeInsert({ range }) {
+      this.popover.visible = false;
+      await this.$nextTick();
       const p = this.textSelection.getRangePosition(range);
       this.$refs.dropdown.style.display = "none";
       this.popoverType = "add";
       const index = this.textSelection.getRangeIndex(range);
-      this.popoverColor = this.getColor(index);
-      Object.assign(this.$refs.popover.style, {
-        left: `${p.left + p.width / 2}px`,
-        top: `${p.top}px`,
-        display: "block",
-      });
+      this.popover.color = this.getColor(index);
+      this.popover.left = p.left + p.width / 2;
+      this.popover.top = p.top;
+      this.popover.visible = true;
       if (this.range && !this.range.data) {
         this.textSelection.removeRange(this.range);
       }
       this.range = range;
     },
-    onRangeClick({ range }) {
+    async onRangeClick({ range }) {
+      this.popover.visible = false;
+      await this.$nextTick();
       this.popoverType = "remove";
       const option = this.options.find((item) => item.value === range.data);
       this.popoverText = option ? option.label : range.data;
@@ -116,11 +117,11 @@ export default {
       this.range = range;
       const p = this.textSelection.getRangePosition(range);
       const index = this.textSelection.getRangeIndex(range);
-      this.popoverColor = this.getColor(index);
-      Object.assign(this.$refs.popover.style, {
-        left: `${p.left + p.width / 2}px`,
-        top: `${p.top}px`,
-        display: "block",
+      Object.assign(this.popover, {
+        visible: true,
+        color: this.getColor(index),
+        left: p.left + p.width / 2,
+        top: p.top,
       });
     },
     onMenuClick(value) {
@@ -136,14 +137,14 @@ export default {
         this.range = null;
       }
       this.$refs.dropdown.style.display = "none";
-      this.$refs.popover.style.display = "none";
+      this.popover.visible = false;
     },
     /**
      * 添加标注
      */
     addMark() {
       const p = this.textSelection.getRangePosition(this.range);
-      this.$refs.popover.style.display = "none";
+      this.popover.visible = false;
       Object.assign(this.$refs.dropdown.style, {
         display: "block",
         left: `${p.left}px`,
@@ -154,7 +155,7 @@ export default {
      * 删除标注
      */
     removeMark() {
-      this.$refs.popover.style.display = "none";
+      this.popover.visible = false;
       this.textSelection.removeRange(this.range);
       this.$emit("update:ranges", [...this.textSelection.ranges]);
     },
@@ -200,61 +201,32 @@ export default {
       }
     }
   }
-  .popover {
-    position: absolute;
-    box-sizing: border-box;
-    height: 32px;
-    border-radius: 4px;
-    background: #607ae3;
-    padding: 5px 8px;
-    transform: translate(-50%, -40px);
-    display: none;
-    white-space: nowrap;
-    box-shadow: 0px 9px 28px 8px rgba(0, 0, 0, 0.05),
-      0px 6px 16px 0px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12);
-    .content {
-      font-size: 14px;
-      font-weight: 400;
-      color: rgba(255, 255, 255, 0.85);
-      line-height: 22px;
-      .add-mark {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        line-height: 16px;
-        height: 22px;
-        .anticon-plus {
-          margin-right: 6px;
-          height: 14px;
-        }
-        &:hover {
-          opacity: 0.75;
-        }
-      }
-      .remove-mark {
-        display: flex;
-        align-items: center;
-        line-height: 16px;
-        height: 22px;
-        .anticon-close {
-          margin-left: 6px;
-          cursor: pointer;
-          height: 14px;
-          &:hover {
-            opacity: 0.75;
-          }
-        }
-      }
+  .add-mark {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    line-height: 16px;
+    height: 22px;
+    .anticon-plus {
+      margin-right: 6px;
+      height: 14px;
     }
-    .arrow {
-      display: block;
-      position: absolute;
-      top: 32px;
-      border-top: 4px solid #607ae3;
-      border-left: 4px solid transparent;
-      border-right: 4px solid transparent;
-      left: 50%;
-      margin-left: -4px;
+    &:hover {
+      opacity: 0.75;
+    }
+  }
+  .remove-mark {
+    display: flex;
+    align-items: center;
+    line-height: 16px;
+    height: 22px;
+    .anticon-close {
+      margin-left: 6px;
+      cursor: pointer;
+      height: 14px;
+      &:hover {
+        opacity: 0.75;
+      }
     }
   }
   .dropdown-menu {
