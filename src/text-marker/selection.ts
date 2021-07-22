@@ -1,5 +1,9 @@
 import EventEmitter from "./eventEmitter";
 
+function isSpan(node: any): node is HTMLSpanElement {
+  return node && node.nodeType === 1 && node.nodeName === "SPAN";
+}
+
 export interface TextRange {
   /**
    * 文本开始位置
@@ -210,10 +214,6 @@ class TextSelection extends EventEmitter {
     this.container.removeEventListener("click", this.onClick);
     this.clear();
   }
-}
-
-function isSpan(node: any): node is HTMLSpanElement {
-  return node && node.nodeType === 1 && node.nodeName === "SPAN";
 }
 
 export default TextSelection;

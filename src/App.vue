@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <TextMark :rawText="rawText" :ranges.sync="ranges" :options="options" />
+    <TextMarker :rawText="rawText" :ranges.sync="ranges" :options="options" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import TextMark from "./text-mark/TextMark.vue";
+import TextMarker from "@/text-marker";
 
 @Component({
   components: {
-    TextMark,
+    TextMarker,
   },
 })
 export default class App extends Vue {
@@ -25,7 +25,7 @@ export default class App extends Vue {
   ];
   options = [
     {
-      label: "@日期12312312312312313123123123",
+      label: "@日期123123123",
       value: "@日期",
     },
     {
