@@ -22,6 +22,11 @@ export default class App extends Vue {
       end: 15,
       data: "@日期",
     },
+    {
+      start: 20,
+      end: 32,
+      data: "@日期",
+    },
   ];
   options = [
     {

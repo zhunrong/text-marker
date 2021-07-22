@@ -1,6 +1,6 @@
-import { PluginObject, Component } from "vue/types";
+import { PluginObject, VueConstructor } from "vue/types";
 
-type TextMarker = Component & PluginObject<void>;
+type TextMarker = VueConstructor & PluginObject<void>;
 
 declare const marker: TextMarker;
 

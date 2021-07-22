@@ -1,7 +1,15 @@
 {
   "name": "@dmd/text-marker",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.1",
+  "description": "划词标注组件",
+  "author": {
+    "name": "chenzhunrong",
+    "email": "chenzhunrong@dm-ai.cn"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.dm-ai.cn:frontend/components/text-marker.git"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
