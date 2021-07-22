@@ -25,7 +25,7 @@ export default class App extends Vue {
   ];
   options = [
     {
-      label: "@日期",
+      label: "@日期12312312312312313123123123",
       value: "@日期",
     },
     {
@@ -35,6 +35,18 @@ export default class App extends Vue {
     {
       label: "@地名",
       value: "@地名",
+    },
+    {
+      label: "@日期2",
+      value: "@日期2",
+    },
+    {
+      label: "@时间2",
+      value: "@时间2",
+    },
+    {
+      label: "@地名2",
+      value: "@地名2",
     },
   ];
 }

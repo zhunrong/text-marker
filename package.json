@@ -1,5 +1,5 @@
 {
-  "name": "selection-mark",
+  "name": "text-marker",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,7 +11,6 @@
   "dependencies": {
     "ant-design-vue": "^1.7.6",
     "core-js": "^3.6.5",
-    "easy-marker": "^1.1.23",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^9.1.2"

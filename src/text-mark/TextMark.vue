@@ -9,18 +9,7 @@
         {{ popoverText }} <Icon @click="removeMark" type="close" />
       </div>
     </Popover>
-    <div ref="dropdown" class="dropdown-menu" @mouseup.stop>
-      <ul>
-        <li
-          v-for="item in options"
-          :key="item.value"
-          @click="onMenuClick(item.value)"
-        >
-          {{ item.label }}
-        </li>
-        <li v-if="!options.length" class="no-data" key="_no_data_">暂无数据</li>
-      </ul>
-    </div>
+    <Dropdown :options="options" v-bind="dropdown" @select="onSelect" />
   </div>
 </template>
 
@@ -28,6 +17,7 @@
 import TextSelection from "./selection";
 import { Icon } from "ant-design-vue";
 import Popover from "./Popover.vue";
+import Dropdown from "./Dropdown.vue";
 
 const COLORS = [
   "#607AE3",
@@ -40,6 +30,7 @@ const COLORS = [
 
 export default {
   components: {
+    Dropdown,
     Popover,
     Icon,
   },
@@ -71,6 +62,11 @@ export default {
         left: 0,
         top: 0,
       },
+      dropdown: {
+        visible: false,
+        left: 0,
+        top: 0,
+      },
     };
   },
   mounted() {
@@ -93,7 +89,7 @@ export default {
       this.popover.visible = false;
       await this.$nextTick();
       const p = this.textSelection.getRangePosition(range);
-      this.$refs.dropdown.style.display = "none";
+      this.dropdown.visible = false;
       this.popoverType = "add";
       const index = this.textSelection.getRangeIndex(range);
       this.popover.color = this.getColor(index);
@@ -124,9 +120,9 @@ export default {
         top: p.top,
       });
     },
-    onMenuClick(value) {
+    onSelect(value) {
       this.range.data = value;
-      this.$refs.dropdown.style.display = "none";
+      this.dropdown.visible = false;
       this.range = null;
       this.textSelection.renderHTML();
       this.$emit("update:ranges", [...this.textSelection.ranges]);
@@ -136,7 +132,7 @@ export default {
         this.textSelection.removeRange(this.range);
         this.range = null;
       }
-      this.$refs.dropdown.style.display = "none";
+      this.dropdown.visible = false;
       this.popover.visible = false;
     },
     /**
@@ -144,11 +140,12 @@ export default {
      */
     addMark() {
       const p = this.textSelection.getRangePosition(this.range);
+      const bbox = this.textSelection.getBBox();
       this.popover.visible = false;
-      Object.assign(this.$refs.dropdown.style, {
-        display: "block",
-        left: `${p.left}px`,
-        top: `${p.top + p.height}px`,
+      Object.assign(this.dropdown, {
+        visible: true,
+        left: Math.min(p.left, bbox.width - 180),
+        top: p.top + p.height + 5,
       });
     },
     /**
@@ -227,39 +224,6 @@ export default {
       &:hover {
         opacity: 0.75;
       }
-    }
-  }
-  .dropdown-menu {
-    position: absolute;
-    display: none;
-    width: 200px;
-    max-height: 150px;
-    background: rgba(255, 255, 255, 1);
-    box-shadow: 0px 9px 28px 8px rgba(0, 0, 0, 0.05),
-      0px 6px 16px 0px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12);
-    border-radius: 4px;
-    ul {
-      margin: 0;
-      padding: 4px 0;
-      list-style: none;
-    }
-    li {
-      height: 32px;
-      padding: 5px 12px;
-      box-sizing: border-box;
-      font-size: 14px;
-      font-weight: 400;
-      color: rgba(0, 0, 0, 0.65);
-      line-height: 22px;
-      cursor: pointer;
-      &:hover {
-        background: rgba(96, 122, 227, 0.1);
-        color: rgba(0, 0, 0, 0.85);
-        font-weight: 500;
-      }
-    }
-    .no-data {
-      cursor: initial;
     }
   }
 }
