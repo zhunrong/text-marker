@@ -1,6 +1,6 @@
 {
   "name": "@dmd/text-marker",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "划词标注组件",
   "author": {
     "name": "chenzhunrong",
@@ -26,12 +26,14 @@
   "types": "types",
   "dependencies": {
     "core-js": "^3.6.5",
+    "lodash": "^4.17.21",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^8.4.2"
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
+    "@types/lodash": "^4.14.171",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.0",

@@ -41,18 +41,6 @@ export default class App extends Vue {
       label: "@地名",
       value: "@地名",
     },
-    {
-      label: "@日期2",
-      value: "@日期2",
-    },
-    {
-      label: "@时间2",
-      value: "@时间2",
-    },
-    {
-      label: "@地名2",
-      value: "@地名2",
-    },
   ];
 }
 </script>

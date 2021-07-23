@@ -6,7 +6,7 @@
         <Icon type="plus" />添加标注
       </div>
       <div v-if="popoverType === 'remove'" class="remove-mark">
-        {{ popoverText }} <Icon @click="removeMark" type="close" />
+        {{ popoverText }} <Icon @click.native="removeMark" type="close" />
       </div>
     </Popover>
     <Dropdown :options="options" v-bind="dropdown" @select="onSelect" />
@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref } from "vue-property-decorator";
+import { Vue, Component, Prop, Ref, Watch } from "vue-property-decorator";
 import TextSelection, { TextRange } from "./selection";
 import Popover from "./Popover.vue";
 import Dropdown from "./Dropdown.vue";
@@ -64,14 +64,25 @@ export default class TextMarker extends Vue {
   range!: TextRange | null;
   textSelection!: TextSelection;
 
+  @Watch("ranges")
+  onRangesChange() {
+    this.textSelection.init(this.rawText, this.ranges);
+  }
+
+  @Watch("rawText")
+  onRawTextChange() {
+    this.textSelection.init(this.rawText, this.ranges);
+  }
+
   mounted() {
     this.textSelection = new TextSelection(this.paragraph);
     this.textSelection.init(this.rawText, this.ranges);
-    this.$emit("update:ranges", [...this.textSelection.ranges]);
+    // this.$emit("update:ranges", [...this.textSelection.ranges]);
     this.textSelection.on("range:insert", this.onRangeInsert);
     this.textSelection.on("range:click", this.onRangeClick);
     document.addEventListener("mouseup", this.onDocClick);
   }
+
   beforeDestroy() {
     if (this.textSelection) {
       this.textSelection.destroy();
@@ -176,6 +187,7 @@ export default class TextMarker extends Vue {
     font-size: 14px;
     font-weight: 400;
     color: rgba(0, 0, 0, 0.65);
+    margin: 0;
     &::v-deep {
       .default {
         background-color: #cad9ff;

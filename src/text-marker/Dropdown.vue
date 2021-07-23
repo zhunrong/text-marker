@@ -2,11 +2,12 @@
   <div
     v-show="visible"
     class="dropdown-menu"
-    :style="{ left: `${left}px`, top: `${top}px`, transform }"
+    :style="{ left: `${left}px`, top: `${top}px`, transform, opacity }"
     @mouseup.stop
   >
     <ul>
       <li
+        class="menu-item"
         v-for="item in options"
         :key="item.value"
         :title="item.label"
@@ -50,7 +51,7 @@ export default {
       if (this.visible) {
         this.transform = "translate3d(0, -5px, 0)";
         this.opacity = 0.5;
-        this.$nextTick(() => {
+        requestAnimationFrame(() => {
           this.transform = "translate3d(0,0,0)";
           this.opacity = 1;
         });
@@ -93,14 +94,16 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    &:hover {
-      background: rgba(96, 122, 227, 0.1);
-      color: rgba(0, 0, 0, 0.85);
-      font-weight: 500;
-    }
+  }
+  .menu-item:hover {
+    background: rgba(96, 122, 227, 0.1);
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
   }
   .no-data {
     cursor: initial;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.45);
   }
 }
 </style>

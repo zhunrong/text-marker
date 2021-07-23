@@ -49,7 +49,7 @@ export default {
       if (this.visible) {
         this.transform = "translate(-50%, -30px)";
         this.opacity = 0.5;
-        this.$nextTick(() => {
+        requestAnimationFrame(() => {
           this.transform = "translate(-50%, -40px)";
           this.opacity = 1;
         });

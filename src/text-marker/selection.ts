@@ -1,4 +1,5 @@
 import EventEmitter from "./eventEmitter";
+import isEqual from "lodash/isEqual";
 
 function isSpan(node: any): node is HTMLSpanElement {
   return node && node.nodeType === 1 && node.nodeName === "SPAN";
@@ -38,8 +39,12 @@ class TextSelection extends EventEmitter {
   }
 
   init(rawText: string, ranges: TextRange[] = []) {
+    if (isEqual(this.ranges, ranges) && rawText === this.rawText) return;
     this.rawText = rawText;
     this.ranges = ranges.map(({ start, end, data }) => {
+      if (typeof start !== "number" || typeof end !== "number") {
+        throw new Error("start、end字段必须是数字");
+      }
       return {
         start,
         end,
