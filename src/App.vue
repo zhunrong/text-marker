@@ -1,7 +1,13 @@
 <template>
   <div id="app">
     <div style="height: 600px"></div>
-    <TextMarker :rawText="rawText" :ranges.sync="ranges" :options="options" />
+    <TextMarker
+      :rawText="rawText"
+      :ranges.sync="ranges"
+      :options="options"
+      @removeMark="onRemoveMark"
+      @addMark="onAddMark"
+    />
     <div style="height: 600px"></div>
   </div>
 </template>
@@ -44,6 +50,14 @@ export default class App extends Vue {
       value: "@地名",
     },
   ];
+
+  onRemoveMark(range: any) {
+    console.log("remove", range);
+  }
+
+  onAddMark(range: any) {
+    console.log("add", range);
+  }
 }
 </script>
 

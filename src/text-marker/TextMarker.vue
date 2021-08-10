@@ -133,10 +133,11 @@ export default class TextMarker extends Vue {
     if (!this.range) return;
     this.range.data = value;
     this.dropdown.visible = false;
-    this.range = null;
     this.textSelection.renderHTML();
     this.$emit("update:ranges", [...this.textSelection.ranges]);
     this.$emit("change", [...this.textSelection.ranges]);
+    this.$emit("addMark", { ...this.range });
+    this.range = null;
   }
 
   onDocClick() {
@@ -169,6 +170,7 @@ export default class TextMarker extends Vue {
     this.textSelection.removeRange(this.range);
     this.$emit("update:ranges", [...this.textSelection.ranges]);
     this.$emit("change", [...this.textSelection.ranges]);
+    this.$emit("removeMark", { ...this.range });
   }
 
   getColor(index: number) {

@@ -36,7 +36,6 @@ export default {
   watch: {
     visible() {
       if (this.visible && this.$el && this.reference) {
-        document.body.appendChild(this.$el);
         if (this.popper) {
           this.popper.destroy();
         }
@@ -46,10 +45,14 @@ export default {
       }
     },
   },
+  mounted() {
+    document.body.appendChild(this.$el);
+  },
   beforeDestroy() {
     if (this.popper) {
       this.popper.destroy();
     }
+    document.body.removeChild(this.$el);
   },
   methods: {
     onMenuClick(value) {

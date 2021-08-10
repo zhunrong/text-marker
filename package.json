@@ -1,6 +1,6 @@
 {
   "name": "@dmd/text-marker",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "划词标注组件",
   "author": {
     "name": "chenzhunrong",
