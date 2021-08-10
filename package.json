@@ -1,6 +1,6 @@
 {
   "name": "@dmd/text-marker",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "划词标注组件",
   "author": {
     "name": "chenzhunrong",
@@ -26,6 +26,7 @@
   "types": "types",
   "dependencies": {
     "@dmd/text-marker": "^0.1.3",
+    "@popperjs/core": "^2.9.3",
     "core-js": "^3.6.5",
     "lodash": "^4.17.21",
     "vue": "^2.6.11",

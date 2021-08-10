@@ -1,10 +1,5 @@
 <template>
-  <div
-    v-show="visible"
-    class="dropdown-menu"
-    :style="{ left: `${left}px`, top: `${top}px`, transform, opacity }"
-    @mouseup.stop
-  >
+  <div v-show="visible" class="dropdown-menu" @mouseup.stop>
     <ul>
       <li
         class="menu-item"
@@ -21,6 +16,8 @@
 </template>
 
 <script>
+import { createPopper } from "@popperjs/core";
+
 export default {
   props: {
     options: {
@@ -31,32 +28,28 @@ export default {
       type: Boolean,
       default: false,
     },
-    top: {
-      type: Number,
-      default: 0,
+    reference: {
+      type: HTMLElement,
+      default: null,
     },
-    left: {
-      type: Number,
-      default: 0,
-    },
-  },
-  data() {
-    return {
-      transform: "translate3d(0,0,0)",
-      opacity: 1,
-    };
   },
   watch: {
     visible() {
-      if (this.visible) {
-        this.transform = "translate3d(0, -5px, 0)";
-        this.opacity = 0.5;
-        requestAnimationFrame(() => {
-          this.transform = "translate3d(0,0,0)";
-          this.opacity = 1;
+      if (this.visible && this.$el && this.reference) {
+        document.body.appendChild(this.$el);
+        if (this.popper) {
+          this.popper.destroy();
+        }
+        this.popper = createPopper(this.reference, this.$el, {
+          placement: "auto-start",
         });
       }
     },
+  },
+  beforeDestroy() {
+    if (this.popper) {
+      this.popper.destroy();
+    }
   },
   methods: {
     onMenuClick(value) {
@@ -76,7 +69,10 @@ export default {
   box-shadow: 0px 9px 28px 8px rgba(0, 0, 0, 0.05),
     0px 6px 16px 0px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12);
   border-radius: 4px;
-  transition: transform 0.2s, opacity 0.2s;
+  &[data-popper-reference-hidden] {
+    visibility: hidden;
+    pointer-events: none;
+  }
   ul {
     margin: 0;
     padding: 4px 0;

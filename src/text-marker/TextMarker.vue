@@ -153,14 +153,10 @@ export default class TextMarker extends Vue {
    */
   addMark() {
     if (!this.range) return;
-    const p = this.textSelection.getRangePosition(this.range);
-    if (!p) return;
-    const bbox = this.textSelection.getBBox();
     this.popover.visible = false;
     Object.assign(this.dropdown, {
       visible: true,
-      left: Math.min(p.left, bbox.width - 180),
-      top: p.top + p.height + 5,
+      reference: this.textSelection.getRangeElement(this.range),
     });
   }
 

@@ -211,6 +211,17 @@ class TextSelection extends EventEmitter {
     };
   }
 
+  getRangeElement(range: TextRange) {
+    const index = this.getRangeIndex(range);
+    const selector = `span[data-index='${index}']`;
+    const spanEl = this.container.querySelector(selector);
+    if (!spanEl) {
+      console.warn(`不存在：${selector}`);
+      return null;
+    }
+    return spanEl;
+  }
+
   /**
    * 销毁
    */

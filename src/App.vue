@@ -1,6 +1,8 @@
 <template>
   <div id="app">
+    <div style="height: 600px"></div>
     <TextMarker :rawText="rawText" :ranges.sync="ranges" :options="options" />
+    <div style="height: 600px"></div>
   </div>
 </template>
 
@@ -52,5 +54,7 @@ export default class App extends Vue {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   margin-top: 60px;
+  height: 400px;
+  overflow-y: auto;
 }
 </style>
