@@ -110,5 +110,7 @@ export default {
 | 事件名称 | 说明             | 回调参数        |
 | -------- | ---------------- | --------------- |
 | change | 被标注的范围变化时触发 | ranges => void |
+| addMark | 添加标注时触发 | range => void |
+| removeMark | 删除标注时触发 | range => void |
 
 
