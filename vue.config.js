@@ -1,4 +1,4 @@
-let isAnalyzerCreated = false;
+// let isAnalyzerCreated = false;
 
 module.exports = {
   devServer: {
@@ -8,16 +8,15 @@ module.exports = {
     extract: false,
   },
   configureWebpack: (config) => {
-    console.log(config.output);
-    if (
-      process.env.NODE_ENV === "production" &&
-      config.output.libraryTarget === "umd" &&
-      !isAnalyzerCreated
-    ) {
-      const BundleAnalyzerPlugin =
-        require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-      config.plugins.push(new BundleAnalyzerPlugin());
-      isAnalyzerCreated = true;
-    }
+    // if (
+    //   process.env.NODE_ENV === "production" &&
+    //   config.output.libraryTarget === "umd" &&
+    //   !isAnalyzerCreated
+    // ) {
+    //   const BundleAnalyzerPlugin =
+    //     require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+    //   config.plugins.push(new BundleAnalyzerPlugin());
+    //   isAnalyzerCreated = true;
+    // }
   },
 };
