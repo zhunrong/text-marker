@@ -90,42 +90,44 @@ export default class TextMarker extends Vue {
     document.removeEventListener("mouseup", this.onDocClick);
   }
 
-  async onRangeInsert({ range }: { range: TextRange }) {
+  onRangeInsert({ range }: { range: TextRange }) {
     if (this.range && !this.range.data) {
       this.textSelection.removeRange(this.range);
     }
     this.popover.visible = false;
-    await this.$nextTick();
-    const p = this.textSelection.getRangePosition(range);
-    if (!p) return;
-    this.dropdown.visible = false;
-    this.popoverType = "add";
-    const index = this.textSelection.getRangeIndex(range);
-    this.popover.color = this.getColor(index);
-    this.popover.left = p.left + p.width / 2;
-    this.popover.top = p.top;
-    this.popover.visible = true;
-    this.range = range;
+    this.$nextTick(() => {
+      const p = this.textSelection.getRangePosition(range);
+      if (!p) return;
+      this.dropdown.visible = false;
+      this.popoverType = "add";
+      const index = this.textSelection.getRangeIndex(range);
+      this.popover.color = this.getColor(index);
+      this.popover.left = p.left + p.width / 2;
+      this.popover.top = p.top;
+      this.popover.visible = true;
+      this.range = range;
+    });
   }
 
-  async onRangeClick({ range }: { range: TextRange }) {
+  onRangeClick({ range }: { range: TextRange }) {
     this.popover.visible = false;
-    await this.$nextTick();
-    this.popoverType = "remove";
-    const option = this.options.find((item) => item.value === range.data);
-    this.popoverText = option ? option.label : range.data;
-    if (this.range && !this.range.data) {
-      this.textSelection.removeRange(this.range);
-    }
-    this.range = range;
-    const p = this.textSelection.getRangePosition(range);
-    if (!p) return;
-    const index = this.textSelection.getRangeIndex(range);
-    Object.assign(this.popover, {
-      visible: true,
-      color: this.getColor(index),
-      left: p.left + p.width / 2,
-      top: p.top,
+    this.$nextTick(() => {
+      this.popoverType = "remove";
+      const option = this.options.find((item) => item.value === range.data);
+      this.popoverText = option ? option.label : range.data;
+      if (this.range && !this.range.data) {
+        this.textSelection.removeRange(this.range);
+      }
+      this.range = range;
+      const p = this.textSelection.getRangePosition(range);
+      if (!p) return;
+      const index = this.textSelection.getRangeIndex(range);
+      Object.assign(this.popover, {
+        visible: true,
+        color: this.getColor(index),
+        left: p.left + p.width / 2,
+        top: p.top,
+      });
     });
   }
 

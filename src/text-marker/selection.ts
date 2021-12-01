@@ -1,8 +1,25 @@
 import EventEmitter from "./eventEmitter";
-import isEqual from "lodash/isEqual";
 
 function isSpan(node: any): node is HTMLSpanElement {
   return node && node.nodeType === 1 && node.nodeName === "SPAN";
+}
+
+function isEqual(a: TextRange[], b: TextRange[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    const t1 = a[i];
+    const t2 = b[i];
+    if (t1 === t2) continue;
+    const k1 = Object.keys(t1) as (keyof TextRange)[];
+    const k2 = Object.keys(t2) as (keyof TextRange)[];
+    if (k1.length !== k2.length) return false;
+    for (let j = 0; j < k1.length; j++) {
+      const key = k1[j];
+      if (t1[key] !== t2[key]) return false;
+    }
+  }
+  return true;
 }
 
 export interface TextRange {
