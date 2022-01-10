@@ -170,6 +170,13 @@ class TextSelection extends EventEmitter {
 
   onClick = (e: MouseEvent) => {
     if (e.target && isSpan(e.target)) {
+      const selection = window.getSelection();
+      if (selection) {
+        const range = selection.getRangeAt(0);
+        const { startOffset, endOffset } = range;
+        // 拖选文字，认为不是单击操作
+        if (endOffset > startOffset) return;
+      }
       e.stopPropagation();
       const spanEl = e.target;
       const index = Number(spanEl.getAttribute("data-index"));
@@ -199,7 +206,9 @@ class TextSelection extends EventEmitter {
       console.warn(`不存在：${selector}`);
       return null;
     }
-    return spanEl.getBoundingClientRect();
+    // 当 inline 元素跨行的时候，getClientRects 方法会返回多个 DOMRect，每个 DOMRect 对应一行
+    return spanEl.getClientRects()[0];
+    // return spanEl.getBoundingClientRect();
   }
 
   /**
