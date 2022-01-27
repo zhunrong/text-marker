@@ -190,6 +190,7 @@ export default class TextMarker extends Vue {
     font-weight: 400;
     color: rgba(0, 0, 0, 0.65);
     margin: 0;
+    white-space: pre-wrap;
     &::v-deep {
       .default {
         background-color: #cad9ff;
