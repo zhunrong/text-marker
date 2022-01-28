@@ -1,11 +1,14 @@
 <script lang="tsx">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import Vue, { VNode } from "vue";
 
-@Component({
+export default Vue.extend({
   name: "icon",
-})
-export default class extends Vue {
-  @Prop() type!: string;
+  props: {
+    type: {
+      type: String,
+      default: "close",
+    },
+  },
   render() {
     switch (this.type) {
       case "close":
@@ -40,8 +43,8 @@ export default class extends Vue {
           </svg>
         );
       default:
-        return null;
+        return null as unknown as VNode;
     }
-  }
-}
+  },
+});
 </script>

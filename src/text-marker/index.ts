@@ -1,10 +1,12 @@
-import _TextMarker from "./TextMarker.vue";
-import { PluginObject, Component } from "vue/types";
+import component from "./TextMarker.vue";
+import { PluginObject } from "vue/types";
 
-type TextMarker = Component & PluginObject<void>;
+type TextMarker = typeof component & PluginObject<void>;
 
-(_TextMarker as TextMarker).install = function (Vue) {
-  Vue.component("text-marker", _TextMarker);
+const plugin = component as TextMarker;
+
+plugin.install = function (Vue) {
+  Vue.component(component.name, component);
 };
 
-export default _TextMarker as TextMarker;
+export default plugin;

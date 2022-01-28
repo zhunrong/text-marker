@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from "vue-property-decorator";
+import Vue, { PropType } from "vue";
 import TextSelection, { TextRange } from "./selection";
 import Popover from "./Popover.vue";
 import Dropdown from "./Dropdown.vue";
@@ -29,156 +29,160 @@ const COLORS = [
   "#45C26A",
 ];
 
-@Component({
+export default Vue.extend({
   name: "text-marker",
   components: {
     Dropdown,
     Popover,
     Icon,
   },
-})
-export default class TextMarker extends Vue {
-  @Prop({ type: String, default: "" }) rawText!: string;
-  @Prop({ type: Array, default: () => [] }) ranges!: TextRange[];
-  @Prop({ type: Array, default: () => [] }) options!: {
-    label: string;
-    value: string;
-  }[];
-
-  @Ref() paragraph!: HTMLParagraphElement;
-
-  popoverType = "add";
-  popoverText = "";
-  popover = {
-    visible: false,
-    color: "",
-    left: 0,
-    top: 0,
-  };
-  dropdown = {
-    visible: false,
-    left: 0,
-    top: 0,
-  };
-
-  range!: TextRange | null;
-  textSelection!: TextSelection;
-
-  @Watch("ranges")
-  onRangesChange() {
-    this.textSelection.init(this.rawText, this.ranges);
-  }
-
-  @Watch("rawText")
-  onRawTextChange() {
-    this.textSelection.init(this.rawText, this.ranges);
-  }
-
+  props: {
+    rawText: {
+      type: String,
+      default: "",
+    },
+    ranges: {
+      type: Array as PropType<TextRange[]>,
+      default: () => [],
+    },
+    options: {
+      type: Array as PropType<{ label: string; value: string }[]>,
+      default: () => [],
+    },
+  },
+  data() {
+    return {
+      popoverType: "add",
+      popoverText: "",
+      popover: {
+        visible: false,
+        color: "",
+        left: 0,
+        top: 0,
+      },
+      dropdown: {
+        visible: false,
+        left: 0,
+        top: 0,
+      },
+      range: undefined as unknown as TextRange | null,
+      textSelection: undefined as unknown as TextSelection,
+    };
+  },
   mounted() {
-    this.textSelection = new TextSelection(this.paragraph);
+    const paragraph = this.$refs.paragraph as HTMLParagraphElement;
+    this.textSelection = new TextSelection(paragraph);
     this.textSelection.init(this.rawText, this.ranges);
     // this.$emit("update:ranges", [...this.textSelection.ranges]);
     this.textSelection.on("range:insert", this.onRangeInsert);
     this.textSelection.on("range:click", this.onRangeClick);
     document.addEventListener("mouseup", this.onDocClick);
-  }
-
+  },
   beforeDestroy() {
     if (this.textSelection) {
       this.textSelection.destroy();
     }
     document.removeEventListener("mouseup", this.onDocClick);
-  }
-
-  onRangeInsert({ range }: { range: TextRange }) {
-    if (this.range && !this.range.data) {
-      this.textSelection.removeRange(this.range);
-    }
-    this.popover.visible = false;
-    this.$nextTick(() => {
-      const p = this.textSelection.getRangePosition(range);
-      if (!p) return;
-      this.dropdown.visible = false;
-      this.popoverType = "add";
-      const index = this.textSelection.getRangeIndex(range);
-      this.popover.color = this.getColor(index);
-      this.popover.left = p.left + p.width / 2;
-      this.popover.top = p.top;
-      this.popover.visible = true;
-      this.range = range;
-    });
-  }
-
-  onRangeClick({ range }: { range: TextRange }) {
-    this.popover.visible = false;
-    this.$nextTick(() => {
-      this.popoverType = "remove";
-      const option = this.options.find((item) => item.value === range.data);
-      this.popoverText = option ? option.label : range.data;
+  },
+  watch: {
+    ranges() {
+      this.textSelection.init(this.rawText, this.ranges);
+    },
+    rawText() {
+      this.textSelection.init(this.rawText, this.ranges);
+    },
+  },
+  methods: {
+    onRangeInsert({ range }: { range: TextRange }) {
       if (this.range && !this.range.data) {
         this.textSelection.removeRange(this.range);
       }
-      this.range = range;
-      const p = this.textSelection.getRangePosition(range);
-      if (!p) return;
-      const index = this.textSelection.getRangeIndex(range);
-      Object.assign(this.popover, {
-        visible: true,
-        color: this.getColor(index),
-        left: p.left + p.width / 2,
-        top: p.top,
+      this.popover.visible = false;
+      this.$nextTick(() => {
+        const p = this.textSelection.getRangePosition(range);
+        if (!p) return;
+        this.dropdown.visible = false;
+        this.popoverType = "add";
+        const index = this.textSelection.getRangeIndex(range);
+        this.popover.color = this.getColor(index);
+        this.popover.left = p.left + p.width / 2;
+        this.popover.top = p.top;
+        this.popover.visible = true;
+        this.range = range;
       });
-    });
-  }
+    },
 
-  onSelect(value: string) {
-    if (!this.range) return;
-    this.range.data = value;
-    this.dropdown.visible = false;
-    this.textSelection.renderHTML();
-    this.$emit("update:ranges", [...this.textSelection.ranges]);
-    this.$emit("change", [...this.textSelection.ranges]);
-    this.$emit("addMark", { ...this.range });
-    this.range = null;
-  }
+    onRangeClick({ range }: { range: TextRange }) {
+      this.popover.visible = false;
+      this.$nextTick(() => {
+        this.popoverType = "remove";
+        const option = this.options.find((item) => item.value === range.data);
+        this.popoverText = option ? option.label : range.data;
+        if (this.range && !this.range.data) {
+          this.textSelection.removeRange(this.range);
+        }
+        this.range = range;
+        const p = this.textSelection.getRangePosition(range);
+        if (!p) return;
+        const index = this.textSelection.getRangeIndex(range);
+        Object.assign(this.popover, {
+          visible: true,
+          color: this.getColor(index),
+          left: p.left + p.width / 2,
+          top: p.top,
+        });
+      });
+    },
 
-  onDocClick() {
-    if (this.range && !this.range.data) {
-      this.textSelection.removeRange(this.range);
+    onSelect(value: string) {
+      if (!this.range) return;
+      this.range.data = value;
+      this.dropdown.visible = false;
+      this.textSelection.renderHTML();
+      this.$emit("update:ranges", [...this.textSelection.ranges]);
+      this.$emit("change", [...this.textSelection.ranges]);
+      this.$emit("addMark", { ...this.range });
       this.range = null;
-    }
-    this.dropdown.visible = false;
-    this.popover.visible = false;
-  }
+    },
 
-  /**
-   * 添加标注
-   */
-  addMark() {
-    if (!this.range) return;
-    this.popover.visible = false;
-    Object.assign(this.dropdown, {
-      visible: true,
-      reference: this.textSelection.getRangeElement(this.range),
-    });
-  }
+    onDocClick() {
+      if (this.range && !this.range.data) {
+        this.textSelection.removeRange(this.range);
+        this.range = null;
+      }
+      this.dropdown.visible = false;
+      this.popover.visible = false;
+    },
 
-  /**
-   * 删除标注
-   */
-  removeMark() {
-    if (!this.range) return;
-    this.popover.visible = false;
-    this.textSelection.removeRange(this.range);
-    this.$emit("update:ranges", [...this.textSelection.ranges]);
-    this.$emit("change", [...this.textSelection.ranges]);
-    this.$emit("removeMark", { ...this.range });
-  }
+    /**
+     * 添加标注
+     */
+    addMark() {
+      if (!this.range) return;
+      this.popover.visible = false;
+      Object.assign(this.dropdown, {
+        visible: true,
+        reference: this.textSelection.getRangeElement(this.range),
+      });
+    },
 
-  getColor(index: number) {
-    return COLORS[index % COLORS.length];
-  }
-}
+    /**
+     * 删除标注
+     */
+    removeMark() {
+      if (!this.range) return;
+      this.popover.visible = false;
+      this.textSelection.removeRange(this.range);
+      this.$emit("update:ranges", [...this.textSelection.ranges]);
+      this.$emit("change", [...this.textSelection.ranges]);
+      this.$emit("removeMark", { ...this.range });
+    },
+
+    getColor(index: number) {
+      return COLORS[index % COLORS.length];
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
