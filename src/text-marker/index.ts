@@ -9,4 +9,6 @@ plugin.install = function (Vue) {
   Vue.component(component.name, component);
 };
 
+plugin.version = process.env.VUE_APP_VERSION;
+
 export default plugin;
