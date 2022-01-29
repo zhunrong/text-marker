@@ -1,12 +1,16 @@
 <template>
   <div id="app">
-    <TextMarker
-      :rawText="rawText"
-      :ranges.sync="ranges"
-      :options="options"
-      @removeMark="onRemoveMark"
-      @addMark="onAddMark"
-    />
+    <scroll-view style="height: 200px">
+      <div style="padding: 40px 5px">
+        <TextMarker
+          :rawText="rawText"
+          :ranges.sync="ranges"
+          :options="options"
+          @removeMark="onRemoveMark"
+          @addMark="onAddMark"
+        />
+      </div>
+    </scroll-view>
   </div>
 </template>
 

@@ -16,7 +16,13 @@
 </template>
 
 <script>
-import { createPopper } from "@popperjs/core";
+import {
+  computePosition,
+  getScrollParents,
+  flip,
+  hide,
+  inline,
+} from "@floating-ui/dom";
 
 export default {
   props: {
@@ -35,12 +41,20 @@ export default {
   },
   watch: {
     visible() {
-      if (this.visible && this.$el && this.reference) {
-        if (this.popper) {
-          this.popper.destroy();
-        }
-        this.popper = createPopper(this.reference, this.$el, {
-          placement: "auto-start",
+      if (this.visible) {
+        this.parents = [
+          ...getScrollParents(this.reference),
+          ...getScrollParents(this.$refs),
+        ];
+        this.parents.forEach((el) => {
+          el.addEventListener("scroll", this.updatePosition);
+          el.addEventListener("resize", this.updatePosition);
+        });
+        this.updatePosition();
+      } else {
+        this.parents.forEach((el) => {
+          el.removeEventListener("scroll", this.updatePosition);
+          el.removeEventListener("resize", this.updatePosition);
         });
       }
     },
@@ -49,14 +63,30 @@ export default {
     document.body.appendChild(this.$el);
   },
   beforeDestroy() {
-    if (this.popper) {
-      this.popper.destroy();
-    }
     document.body.removeChild(this.$el);
+    if (this.parents) {
+      this.parents.forEach((el) => {
+        el.removeEventListener("scroll", this.updatePosition);
+        el.removeEventListener("resize", this.updatePosition);
+      });
+    }
   },
   methods: {
     onMenuClick(value) {
       this.$emit("select", value);
+    },
+    updatePosition() {
+      computePosition(this.reference, this.$el, {
+        placement: "bottom-start",
+        middleware: [inline(), flip(), hide()],
+      }).then(({ x, y, middlewareData }) => {
+        const { referenceHidden } = middlewareData.hide;
+        Object.assign(this.$el.style, {
+          left: x + "px",
+          top: y + "px",
+          visibility: referenceHidden ? "hidden" : "visible",
+        });
+      });
     },
   },
 };
