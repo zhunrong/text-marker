@@ -20,5 +20,10 @@ module.exports = {
       config.plugins.push(new BundleAnalyzerPlugin());
       isAnalyzerCreated = true;
     }
+    if (config.output.libraryTarget === "umd") {
+      config.externals = {
+        "@floating-ui/dom": "@floating-ui/dom",
+      };
+    }
   },
 };

@@ -6,7 +6,7 @@ type TextMarker = typeof component & PluginObject<void>;
 const plugin = component as TextMarker;
 
 plugin.install = function (Vue) {
-  Vue.component(component.name, component);
+  Vue.component("text-marker", component);
 };
 
 plugin.version = process.env.VUE_APP_VERSION;
