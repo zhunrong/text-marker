@@ -2,6 +2,7 @@
   "name": "@chenzr/text-marker",
   "version": "0.1.1",
   "description": "划词标注组件",
+  "license": "MIT",
   "author": {
     "name": "chenzr",
     "email": "chenzr@chd.edu.cn"
