@@ -1,16 +1,26 @@
 <template>
-  <div v-show="visible" class="dropdown-menu" @mouseup.stop>
+  <div
+    v-show="visible"
+    class="dropdown-menu"
+    @mouseup.stop
+  >
     <ul>
       <li
-        class="menu-item"
         v-for="item in options"
         :key="item.value"
+        class="menu-item"
         :title="item.label"
         @click="onMenuClick(item.value)"
       >
         {{ item.label }}
       </li>
-      <li v-if="!options.length" class="no-data" key="_no_data_">暂无数据</li>
+      <li
+        v-if="!options.length"
+        key="_no_data_"
+        class="no-data"
+      >
+        暂无数据
+      </li>
     </ul>
   </div>
 </template>
@@ -22,7 +32,7 @@ import {
   flip,
   hide,
   inline,
-} from "@floating-ui/dom";
+} from '@floating-ui/dom';
 
 export default {
   props: {
@@ -47,14 +57,14 @@ export default {
           ...getScrollParents(this.$refs),
         ];
         this.parents.forEach((el) => {
-          el.addEventListener("scroll", this.updatePosition);
-          el.addEventListener("resize", this.updatePosition);
+          el.addEventListener('scroll', this.updatePosition);
+          el.addEventListener('resize', this.updatePosition);
         });
         this.updatePosition();
       } else {
         this.parents.forEach((el) => {
-          el.removeEventListener("scroll", this.updatePosition);
-          el.removeEventListener("resize", this.updatePosition);
+          el.removeEventListener('scroll', this.updatePosition);
+          el.removeEventListener('resize', this.updatePosition);
         });
       }
     },
@@ -66,25 +76,25 @@ export default {
     document.body.removeChild(this.$el);
     if (this.parents) {
       this.parents.forEach((el) => {
-        el.removeEventListener("scroll", this.updatePosition);
-        el.removeEventListener("resize", this.updatePosition);
+        el.removeEventListener('scroll', this.updatePosition);
+        el.removeEventListener('resize', this.updatePosition);
       });
     }
   },
   methods: {
     onMenuClick(value) {
-      this.$emit("select", value);
+      this.$emit('select', value);
     },
     updatePosition() {
       computePosition(this.reference, this.$el, {
-        placement: "bottom-start",
+        placement: 'bottom-start',
         middleware: [inline(), flip(), hide()],
       }).then(({ x, y, middlewareData }) => {
         const { referenceHidden } = middlewareData.hide;
         Object.assign(this.$el.style, {
-          left: x + "px",
-          top: y + "px",
-          visibility: referenceHidden ? "hidden" : "visible",
+          left: x + 'px',
+          top: y + 'px',
+          visibility: referenceHidden ? 'hidden' : 'visible',
         });
       });
     },

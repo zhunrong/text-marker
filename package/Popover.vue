@@ -1,9 +1,21 @@
 <template>
-  <div v-show="visible" class="popover" :style="containerStyle" @mouseup.stop>
-    <div ref="content" class="popover-content" :style="contentStyle">
+  <div
+    v-show="visible"
+    class="popover"
+    :style="containerStyle"
+    @mouseup.stop
+  >
+    <div
+      ref="content"
+      class="popover-content"
+      :style="contentStyle"
+    >
       <slot />
     </div>
-    <i class="popover-arrow" :style="arrowStyle"></i>
+    <i
+      class="popover-arrow"
+      :style="arrowStyle"
+    />
   </div>
 </template>
 
@@ -12,7 +24,7 @@ export default {
   props: {
     color: {
       type: String,
-      default: "#fff",
+      default: '#fff',
     },
     visible: {
       type: Boolean,
@@ -55,11 +67,11 @@ export default {
         const outer = container.parentElement;
         const content = this.$refs.content;
         Object.assign(container.style, {
-          transform: "translate3d(0, -30px, 0)",
+          transform: 'translate3d(0, -30px, 0)',
           opacity: 0.5,
         });
         Object.assign(content.style, {
-          transform: "translate(-50%, 0)",
+          transform: 'translate(-50%, 0)',
         });
         requestAnimationFrame(() => {
           const outerRect = outer.getBoundingClientRect();
@@ -75,7 +87,7 @@ export default {
             transform: `translate(${offsetX}px, 0)`,
           });
           Object.assign(container.style, {
-            transform: "translate3d(0, -40px, 0)",
+            transform: 'translate3d(0, -40px, 0)',
             opacity: 1,
           });
         });
