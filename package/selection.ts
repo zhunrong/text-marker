@@ -1,7 +1,7 @@
-import EventEmitter from "./eventEmitter";
+import EventEmitter from './eventEmitter';
 
 function isSpan(node: any): node is HTMLSpanElement {
-  return node && node.nodeType === 1 && node.nodeName === "SPAN";
+  return node && node.nodeType === 1 && node.nodeName === 'SPAN';
 }
 
 function isEqual(a: TextRange[], b: TextRange[]): boolean {
@@ -47,20 +47,20 @@ export interface Position {
 
 class TextSelection extends EventEmitter {
   ranges: TextRange[] = [];
-  rawText = "";
+  rawText = '';
 
   constructor(public container: HTMLElement) {
     super();
-    this.container.addEventListener("mouseup", this.onMouseUp);
-    this.container.addEventListener("click", this.onClick);
+    this.container.addEventListener('mouseup', this.onMouseUp);
+    this.container.addEventListener('click', this.onClick);
   }
 
   init(rawText: string, ranges: TextRange[] = []) {
     if (isEqual(this.ranges, ranges) && rawText === this.rawText) return;
     this.rawText = rawText;
     this.ranges = ranges.map(({ start, end, data }) => {
-      if (typeof start !== "number" || typeof end !== "number") {
-        throw new Error("start、end字段必须是数字");
+      if (typeof start !== 'number' || typeof end !== 'number') {
+        throw new Error('start、end字段必须是数字');
       }
       return {
         start,
@@ -69,7 +69,7 @@ class TextSelection extends EventEmitter {
         text: rawText.slice(start, end),
       };
     });
-    this.emit("ranges:update", this.ranges);
+    this.emit('ranges:update', this.ranges);
     this.renderHTML();
   }
 
@@ -90,9 +90,9 @@ class TextSelection extends EventEmitter {
       start,
       end,
       text: this.rawText.slice(start, end),
-      data: "",
+      data: '',
     });
-    this.emit("ranges:update", this.ranges);
+    this.emit('ranges:update', this.ranges);
     this.renderHTML();
     return i;
   }
@@ -104,9 +104,9 @@ class TextSelection extends EventEmitter {
   removeRange(range: TextRange): number;
   removeRange(index: number): TextRange;
   removeRange(param: TextRange | number) {
-    if (typeof param === "number") {
+    if (typeof param === 'number') {
       const result = this.ranges.splice(param, 1)[0];
-      this.emit("ranges:update", this.ranges);
+      this.emit('ranges:update', this.ranges);
       if (result) {
         this.renderHTML();
       }
@@ -115,7 +115,7 @@ class TextSelection extends EventEmitter {
     const index = this.getRangeIndex(param);
     if (index > -1) {
       this.ranges.splice(index, 1);
-      this.emit("ranges:update", this.ranges);
+      this.emit('ranges:update', this.ranges);
       this.renderHTML();
     }
     return index;
@@ -123,7 +123,7 @@ class TextSelection extends EventEmitter {
 
   renderHTML() {
     let offset = 0;
-    let html = "";
+    let html = '';
     this.ranges.forEach((range, index) => {
       html += this.rawText.slice(offset, range.start);
       /* eslint-disable */
@@ -153,14 +153,14 @@ class TextSelection extends EventEmitter {
     if (startContainer.parentNode !== this.container) return;
     const prevNode = startContainer.previousSibling;
     if (prevNode && isSpan(prevNode)) {
-      const prevNodeEnd = Number(prevNode.getAttribute("data-end"));
+      const prevNodeEnd = Number(prevNode.getAttribute('data-end'));
       startOffset += prevNodeEnd;
       endOffset += prevNodeEnd;
     }
     const insertIndex = this.insertRange(startOffset, endOffset);
     setTimeout(() => {
       const range = this.ranges[insertIndex];
-      this.emit("range:insert", {
+      this.emit('range:insert', {
         index: insertIndex,
         range,
       });
@@ -179,9 +179,9 @@ class TextSelection extends EventEmitter {
       }
       e.stopPropagation();
       const spanEl = e.target;
-      const index = Number(spanEl.getAttribute("data-index"));
+      const index = Number(spanEl.getAttribute('data-index'));
       const range = this.ranges[index];
-      this.emit("range:click", {
+      this.emit('range:click', {
         index,
         range,
       });
@@ -195,7 +195,7 @@ class TextSelection extends EventEmitter {
   getRangeBBox(index: number): DOMRect | null;
   getRangeBBox(param: any) {
     let index = -1;
-    if (typeof param === "number") {
+    if (typeof param === 'number') {
       index = param;
     } else {
       index = this.getRangeIndex(param);
@@ -252,8 +252,8 @@ class TextSelection extends EventEmitter {
    * 销毁
    */
   destroy() {
-    this.container.removeEventListener("mouseup", this.onMouseUp);
-    this.container.removeEventListener("click", this.onClick);
+    this.container.removeEventListener('mouseup', this.onMouseUp);
+    this.container.removeEventListener('click', this.onClick);
     this.clear();
   }
 }
