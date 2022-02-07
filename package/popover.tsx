@@ -1,26 +1,7 @@
-<template>
-  <div
-    v-show="visible"
-    class="popover"
-    :style="containerStyle"
-    @mouseup.stop
-  >
-    <div
-      ref="content"
-      class="popover-content"
-      :style="contentStyle"
-    >
-      <slot />
-    </div>
-    <i
-      class="popover-arrow"
-      :style="arrowStyle"
-    />
-  </div>
-</template>
+import Vue from 'vue';
+import './popover.scss';
 
-<script>
-export default {
+export default Vue.extend({
   props: {
     color: {
       type: String,
@@ -43,18 +24,18 @@ export default {
     return {};
   },
   computed: {
-    containerStyle() {
+    containerStyle(): Record<string, string> {
       return {
         left: `${this.left}px`,
         top: `${this.top}px`,
       };
     },
-    contentStyle() {
+    contentStyle(): Record<string, string> {
       return {
         backgroundColor: this.color,
       };
     },
-    arrowStyle() {
+    arrowStyle(): Record<string, string> {
       return {
         borderTopColor: this.color,
       };
@@ -63,9 +44,9 @@ export default {
   watch: {
     visible() {
       if (this.visible) {
-        const container = this.$el;
+        const container = this.$el as HTMLDivElement;
         const outer = container.parentElement;
-        const content = this.$refs.content;
+        const content = this.$refs.content as HTMLDivElement;
         Object.assign(container.style, {
           transform: 'translate3d(0, -30px, 0)',
           opacity: 0.5,
@@ -94,39 +75,19 @@ export default {
       }
     },
   },
-};
-</script>
-
-<style lang="scss" scoped>
-.popover {
-  position: absolute;
-  transform: translate3d(0, -40px, 0);
-  transition: transform 0.2s, opacity 0.2s;
-  box-shadow: 0px 9px 28px 8px rgba(0, 0, 0, 0.05),
-    0px 6px 16px 0px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12);
-  .popover-content {
-    font-size: 14px;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.85);
-    line-height: 22px;
-    position: absolute;
-    box-sizing: border-box;
-    height: 32px;
-    border-radius: 4px;
-    background: #607ae3;
-    padding: 5px 8px;
-    white-space: nowrap;
-    transform: translate(-50%, 0);
-  }
-  .popover-arrow {
-    display: block;
-    position: absolute;
-    top: 32px;
-    border-top: 4px solid #607ae3;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    left: 50%;
-    margin-left: -4px;
-  }
-}
-</style>
+  render() {
+    return (
+      <div
+        class="popover"
+        vShow={this.visible}
+        style={this.containerStyle}
+        vOn:mouseup_stop={() => 0}
+      >
+        <div ref="content" class="popover-content" style={this.contentStyle}>
+          {this.$slots.default}
+        </div>
+        <i class="popover-arrow" style={this.arrowStyle} />
+      </div>
+    );
+  },
+});

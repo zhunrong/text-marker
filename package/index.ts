@@ -1,4 +1,4 @@
-import component from './TextMarker.vue';
+import component from './text-marker';
 import { PluginObject } from 'vue';
 
 type ComponentType = typeof component & PluginObject<void>;

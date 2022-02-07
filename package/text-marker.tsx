@@ -1,41 +1,9 @@
-<template>
-  <div class="text-mark">
-    <p
-      ref="paragraph"
-      class="paragraph"
-    />
-    <Popover v-bind="popover">
-      <div
-        v-if="popoverType === 'add'"
-        class="add-mark"
-        @click="addMark"
-      >
-        <Icon type="plus" />添加标注
-      </div>
-      <div
-        v-if="popoverType === 'remove'"
-        class="remove-mark"
-      >
-        {{ popoverText }} <Icon
-          type="close"
-          @click.native="removeMark"
-        />
-      </div>
-    </Popover>
-    <Dropdown
-      :options="options"
-      v-bind="dropdown"
-      @select="onSelect"
-    />
-  </div>
-</template>
-
-<script lang="ts">
 import Vue, { PropType } from 'vue';
 import TextSelection, { TextRange } from './selection';
-import Popover from './Popover.vue';
-import Dropdown from './Dropdown.vue';
-import Icon from './Icon.vue';
+import Popover from './popover';
+import { CloseIcon, PlusIcon } from './icons';
+import DropdownMenu from './dropdown-menu';
+import './text-marker.scss';
 
 const COLORS = [
   '#607AE3',
@@ -49,9 +17,10 @@ const COLORS = [
 export default Vue.extend({
   name: 'TextMarker',
   components: {
-    Dropdown,
     Popover,
-    Icon,
+    CloseIcon,
+    PlusIcon,
+    DropdownMenu,
   },
   props: {
     rawText: {
@@ -66,7 +35,7 @@ export default Vue.extend({
     },
     options: {
       type: Array as PropType<{ label: string; value: string }[]>,
-      default(){
+      default() {
         return [];
       },
     },
@@ -203,73 +172,30 @@ export default Vue.extend({
       return COLORS[index % COLORS.length];
     },
   },
+  render() {
+    return (
+      <div class="text-mark">
+        <p ref="paragraph" class="paragraph"></p>
+        <popover {...{props: this.popover}}>
+          {this.popoverType === 'add' && (
+            <div class="add-mark" vOn:click={this.addMark}>
+              <plus-icon />
+              添加标注
+            </div>
+          )}
+          {this.popoverType === 'remove' && (
+            <div class="remove-mark">
+              {this.popoverText}
+              <close-icon vOn:click_native={this.removeMark} />
+            </div>
+          )}
+        </popover>
+        <dropdown-menu
+          {...{props: this.dropdown}}
+          options={this.options}
+          vOn:select={this.onSelect}
+        />
+      </div>
+    );
+  },
 });
-</script>
-
-<style lang="scss" scoped>
-.text-mark {
-  position: relative;
-  .paragraph {
-    line-height: 24px;
-    font-size: 14px;
-    font-weight: 400;
-    color: rgba(0, 0, 0, 0.65);
-    margin: 0;
-    white-space: pre-wrap;
-    &::v-deep {
-      .default {
-        background-color: #cad9ff;
-        cursor: pointer;
-        position: relative;
-        padding: 3px 0;
-      }
-      span:nth-child(6n + 1) {
-        background-color: rgba(202, 217, 255, 1);
-      }
-      span:nth-child(6n + 2) {
-        background-color: rgba(254, 200, 200, 1);
-      }
-      span:nth-child(6n + 3) {
-        background-color: rgba(192, 240, 233, 1);
-      }
-      span:nth-child(6n + 4) {
-        background-color: rgba(254, 227, 198, 1);
-      }
-      span:nth-child(6n + 5) {
-        background-color: rgba(199, 191, 255, 1);
-      }
-      span:nth-child(6n + 6) {
-        background-color: rgba(195, 231, 205, 1);
-      }
-    }
-  }
-  .add-mark {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    line-height: 16px;
-    height: 22px;
-    .icon-plus {
-      margin-right: 6px;
-      height: 14px;
-    }
-    &:hover {
-      opacity: 0.75;
-    }
-  }
-  .remove-mark {
-    display: flex;
-    align-items: center;
-    line-height: 16px;
-    height: 22px;
-    .icon-close {
-      margin-left: 6px;
-      cursor: pointer;
-      height: 14px;
-      &:hover {
-        opacity: 0.75;
-      }
-    }
-  }
-}
-</style>

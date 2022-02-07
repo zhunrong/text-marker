@@ -1,0 +1,63 @@
+.text-mark {
+  position: relative;
+  .paragraph {
+    line-height: 24px;
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.65);
+    margin: 0;
+    white-space: pre-wrap;
+    .default {
+      background-color: #cad9ff;
+      cursor: pointer;
+      position: relative;
+      padding: 3px 0;
+    }
+    span:nth-child(6n + 1) {
+      background-color: rgba(202, 217, 255, 1);
+    }
+    span:nth-child(6n + 2) {
+      background-color: rgba(254, 200, 200, 1);
+    }
+    span:nth-child(6n + 3) {
+      background-color: rgba(192, 240, 233, 1);
+    }
+    span:nth-child(6n + 4) {
+      background-color: rgba(254, 227, 198, 1);
+    }
+    span:nth-child(6n + 5) {
+      background-color: rgba(199, 191, 255, 1);
+    }
+    span:nth-child(6n + 6) {
+      background-color: rgba(195, 231, 205, 1);
+    }
+  }
+  .add-mark {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    line-height: 16px;
+    height: 22px;
+    .icon-plus {
+      margin-right: 6px;
+      height: 14px;
+    }
+    &:hover {
+      opacity: 0.75;
+    }
+  }
+  .remove-mark {
+    display: flex;
+    align-items: center;
+    line-height: 16px;
+    height: 22px;
+    .icon-close {
+      margin-left: 6px;
+      cursor: pointer;
+      height: 14px;
+      &:hover {
+        opacity: 0.75;
+      }
+    }
+  }
+}
