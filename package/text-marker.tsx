@@ -1,6 +1,6 @@
 import Vue, { PropType } from 'vue';
 import TextSelection, { TextRange } from './selection';
-import Popover from './popover';
+import {Popover} from './popover';
 import { CloseIcon, PlusIcon } from './icons';
 import DropdownMenu from './dropdown-menu';
 import './text-marker.scss';
@@ -17,7 +17,6 @@ const COLORS = [
 export default Vue.extend({
   name: 'TextMarker',
   components: {
-    Popover,
     CloseIcon,
     PlusIcon,
     DropdownMenu,
@@ -44,12 +43,6 @@ export default Vue.extend({
     return {
       popoverType: 'add',
       popoverText: '',
-      popover: {
-        visible: false,
-        color: '',
-        left: 0,
-        top: 0,
-      },
       dropdown: {
         visible: false,
         left: 0,
@@ -57,6 +50,7 @@ export default Vue.extend({
       },
       range: undefined as unknown as TextRange | null,
       textSelection: undefined as unknown as TextSelection,
+      popover: new Popover(),
     };
   },
   watch: {
@@ -87,23 +81,28 @@ export default Vue.extend({
       if (this.range && !this.range.data) {
         this.textSelection.removeRange(this.range);
       }
-      this.popover.visible = false;
+      this.popover.hide();
       this.$nextTick(() => {
         const p = this.textSelection.getRangePosition(range);
         if (!p) return;
         this.dropdown.visible = false;
         this.popoverType = 'add';
         const index = this.textSelection.getRangeIndex(range);
-        this.popover.color = this.getColor(index);
-        this.popover.left = p.left + p.width / 2;
-        this.popover.top = p.top;
-        this.popover.visible = true;
+        const reference = this.textSelection.getRangeElement(range);
+        const color = this.getColor(index);
+        this.popover.show({
+          reference,
+          color,
+          render() {
+            return <div>哈哈</div>;
+          }
+        });
         this.range = range;
       });
     },
 
     onRangeClick({ range }: { range: TextRange }) {
-      this.popover.visible = false;
+      this.popover.hide();
       this.$nextTick(() => {
         this.popoverType = 'remove';
         const option = this.options.find((item) => item.value === range.data);
@@ -115,11 +114,14 @@ export default Vue.extend({
         const p = this.textSelection.getRangePosition(range);
         if (!p) return;
         const index = this.textSelection.getRangeIndex(range);
-        Object.assign(this.popover, {
-          visible: true,
-          color: this.getColor(index),
-          left: p.left + p.width / 2,
-          top: p.top,
+        const reference = this.textSelection.getRangeElement(range);
+        const color = this.getColor(index);
+        this.popover.show({
+          reference,
+          color,
+          render() {
+            return <div>哈哈</div>;
+          }
         });
       });
     },
@@ -141,7 +143,7 @@ export default Vue.extend({
         this.range = null;
       }
       this.dropdown.visible = false;
-      this.popover.visible = false;
+      this.popover.hide();
     },
 
     /**
@@ -149,7 +151,7 @@ export default Vue.extend({
      */
     addMark() {
       if (!this.range) return;
-      this.popover.visible = false;
+      this.popover.hide();
       Object.assign(this.dropdown, {
         visible: true,
         reference: this.textSelection.getRangeElement(this.range),
@@ -161,7 +163,7 @@ export default Vue.extend({
      */
     removeMark() {
       if (!this.range) return;
-      this.popover.visible = false;
+      this.popover.hide();
       this.textSelection.removeRange(this.range);
       this.$emit('update:ranges', [...this.textSelection.ranges]);
       this.$emit('change', [...this.textSelection.ranges]);
@@ -176,7 +178,7 @@ export default Vue.extend({
     return (
       <div class="text-mark">
         <p ref="paragraph" class="paragraph"></p>
-        <popover {...{props: this.popover}}>
+        {/* <popover ref="popover">
           {this.popoverType === 'add' && (
             <div class="add-mark" vOn:click={this.addMark}>
               <plus-icon />
@@ -189,7 +191,7 @@ export default Vue.extend({
               <close-icon vOn:click_native={this.removeMark} />
             </div>
           )}
-        </popover>
+        </popover> */}
         <dropdown-menu
           {...{props: this.dropdown}}
           options={this.options}

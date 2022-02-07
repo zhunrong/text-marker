@@ -33,7 +33,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      parents: undefined as unknown as Element[],
+      parents: undefined as unknown as ReturnType<typeof getScrollParents>,
     };
   },
   watch: {
@@ -42,7 +42,7 @@ export default Vue.extend({
         this.parents = [
           ...getScrollParents(this.reference),
           ...getScrollParents(this.$el),
-        ] as Element[];
+        ];
         this.parents.forEach((el) => {
           el.addEventListener('scroll', this.updatePosition);
           el.addEventListener('resize', this.updatePosition);
