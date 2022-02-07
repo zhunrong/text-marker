@@ -1,8 +1,7 @@
 import Vue, { PropType } from 'vue';
 import TextSelection, { TextRange } from './selection';
-import {Popover} from './popover';
+import { Popover, PopoverBase } from './popover';
 import { CloseIcon, PlusIcon } from './icons';
-import DropdownMenu from './dropdown-menu';
 import './text-marker.scss';
 
 const COLORS = [
@@ -19,7 +18,6 @@ export default Vue.extend({
   components: {
     CloseIcon,
     PlusIcon,
-    DropdownMenu,
   },
   props: {
     rawText: {
@@ -43,14 +41,10 @@ export default Vue.extend({
     return {
       popoverType: 'add',
       popoverText: '',
-      dropdown: {
-        visible: false,
-        left: 0,
-        top: 0,
-      },
       range: undefined as unknown as TextRange | null,
       textSelection: undefined as unknown as TextSelection,
       popover: new Popover(),
+      dropdown: new PopoverBase(),
     };
   },
   watch: {
@@ -65,7 +59,6 @@ export default Vue.extend({
     const paragraph = this.$refs.paragraph as HTMLParagraphElement;
     this.textSelection = new TextSelection(paragraph);
     this.textSelection.init(this.rawText, this.ranges);
-    // this.$emit("update:ranges", [...this.textSelection.ranges]);
     this.textSelection.on('range:insert', this.onRangeInsert);
     this.textSelection.on('range:click', this.onRangeClick);
     document.addEventListener('mouseup', this.onDocClick);
@@ -85,7 +78,7 @@ export default Vue.extend({
       this.$nextTick(() => {
         const p = this.textSelection.getRangePosition(range);
         if (!p) return;
-        this.dropdown.visible = false;
+        this.dropdown.hide();
         this.popoverType = 'add';
         const index = this.textSelection.getRangeIndex(range);
         const reference = this.textSelection.getRangeElement(range);
@@ -93,9 +86,14 @@ export default Vue.extend({
         this.popover.show({
           reference,
           color,
-          render() {
-            return <div>哈哈</div>;
-          }
+          render: () => {
+            return (
+              <div class="add-mark" vOn:click={this.addMark}>
+                <plus-icon />
+                添加标注
+              </div>
+            );
+          },
         });
         this.range = range;
       });
@@ -119,17 +117,22 @@ export default Vue.extend({
         this.popover.show({
           reference,
           color,
-          render() {
-            return <div>哈哈</div>;
-          }
+          render: () => {
+            return (
+              <div class="remove-mark">
+                {this.popoverText}
+                <close-icon vOn:click_native={this.removeMark} />
+              </div>
+            );
+          },
         });
       });
     },
 
     onSelect(value: string) {
       if (!this.range) return;
+      this.dropdown.hide();
       this.range.data = value;
-      this.dropdown.visible = false;
       this.textSelection.renderHTML();
       this.$emit('update:ranges', [...this.textSelection.ranges]);
       this.$emit('change', [...this.textSelection.ranges]);
@@ -142,7 +145,7 @@ export default Vue.extend({
         this.textSelection.removeRange(this.range);
         this.range = null;
       }
-      this.dropdown.visible = false;
+      this.dropdown.hide();
       this.popover.hide();
     },
 
@@ -152,9 +155,32 @@ export default Vue.extend({
     addMark() {
       if (!this.range) return;
       this.popover.hide();
-      Object.assign(this.dropdown, {
-        visible: true,
+      this.dropdown.show({
         reference: this.textSelection.getRangeElement(this.range),
+        render: () => {
+          return (
+            <div class="dropdown-menu">
+              <ul>
+                {this.options.length ? (
+                  this.options.map((item) => (
+                    <li
+                      class="menu-item"
+                      key={item.value}
+                      title={item.label}
+                      vOn:click={() => this.onSelect(item.value)}
+                    >
+                      {item.label}
+                    </li>
+                  ))
+                ) : (
+                  <li class="no-data" key="_no_data_">
+                    暂无数据
+                  </li>
+                )}
+              </ul>
+            </div>
+          );
+        },
       });
     },
 
@@ -178,25 +204,6 @@ export default Vue.extend({
     return (
       <div class="text-mark">
         <p ref="paragraph" class="paragraph"></p>
-        {/* <popover ref="popover">
-          {this.popoverType === 'add' && (
-            <div class="add-mark" vOn:click={this.addMark}>
-              <plus-icon />
-              添加标注
-            </div>
-          )}
-          {this.popoverType === 'remove' && (
-            <div class="remove-mark">
-              {this.popoverText}
-              <close-icon vOn:click_native={this.removeMark} />
-            </div>
-          )}
-        </popover> */}
-        <dropdown-menu
-          {...{props: this.dropdown}}
-          options={this.options}
-          vOn:select={this.onSelect}
-        />
       </div>
     );
   },
