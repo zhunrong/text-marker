@@ -7,73 +7,138 @@ import {
   shift,
   offset,
   arrow,
+  flip,
 } from '@floating-ui/dom';
 import './popover.scss';
 
 type Options = {
   reference: Element;
-  color?: string;
-  render: (createElement: CreateElement) => VNode;
+  render?: (createElement: CreateElement) => VNode;
 };
 
-export class Popover {
-  private popoverContainer = document.createElement('div');
-  private popoverContent = document.createElement('div');
-  private popoverArrow = document.createElement('i');
-  private vm: Vue = null;
-  private reference: Element = null;
-  private color = '#fff';
-  private parents: ReturnType<typeof getScrollParents> = [];
+export class PopoverBase<T extends Options = Options> {
+  protected wrapper = document.createElement('div');
+  protected parents: ReturnType<typeof getScrollParents> = [];
+  protected vm: Vue = null;
+  protected options: T;
 
   constructor() {
-    this.popoverContainer.className = 'popover';
-    this.popoverContent.className = 'popover-content';
-    this.popoverArrow.className = 'popover-arrow';
-    this.popoverContainer.appendChild(this.popoverContent);
-    this.popoverContainer.appendChild(this.popoverArrow);
+    this.wrapper.onmouseup = (e) => e.stopPropagation();
+    Object.assign(this.wrapper.style, {
+      position: 'absolute',
+    });
   }
 
-  show({ reference, color, render }: Options) {
-    this.hide();
-    this.reference = reference;
-    this.color = color;
-    this.vm = new Vue({
-      render(h) {
-        return <div class="popover-content">{render(h)}</div>;
+  protected createVM() {
+    const {render} = this.options;
+    return new Vue({
+      render: (h) => {
+        return <div>{render?.(h)}</div>;
       },
     });
-    this.vm.$mount(this.popoverContent);
-    document.body.appendChild(this.popoverContainer);
+  }
+
+  protected observeParents() {
+    const { reference } = this.options;
     this.parents = [
-      ...getScrollParents(this.reference),
-      ...getScrollParents(this.popoverContainer),
+      ...getScrollParents(reference),
+      ...getScrollParents(this.wrapper),
     ];
     this.parents.forEach((el) => {
       el.addEventListener('scroll', this.updatePosition);
       el.addEventListener('resize', this.updatePosition);
     });
+  }
+
+  protected unobserveParents() {
+    while (this.parents.length) {
+      const el = this.parents.pop();
+      el.removeEventListener('scroll', this.updatePosition);
+      el.removeEventListener('resize', this.updatePosition);
+    }
+  }
+
+  protected applyOptions(options: T) {
+    this.options = options;
+  }
+
+  show(options: T) {
+    if (this.vm) {
+      this.hide();
+    }
+    this.applyOptions(options);
+    this.vm = this.createVM();
+    const vmRoot = document.createElement('div');
+    this.wrapper.appendChild(vmRoot);
+    document.body.appendChild(this.wrapper);
+    this.vm.$mount(vmRoot);
+    this.observeParents();
     this.updatePosition();
   }
 
   hide() {
-    this.parents.forEach((el) => {
-      el.removeEventListener('scroll', this.updatePosition);
-      el.removeEventListener('resize', this.updatePosition);
+    if (!this.vm) return;
+    this.unobserveParents();
+    this.vm.$destroy();
+    document.body.removeChild(this.wrapper);
+    this.wrapper.removeChild(this.vm.$el);
+    this.vm = null;
+  }
+
+  protected updatePosition = ()=> {
+    const { reference } = this.options;
+    computePosition(reference, this.wrapper, {
+      placement: 'bottom-start',
+      middleware: [inline(), flip(), hide()],
+    }).then(({ x, y, middlewareData }) => {
+      const { hide } = middlewareData;
+      Object.assign(this.wrapper.style, {
+        left: x + 'px',
+        top: y + 'px',
+        visibility: hide.referenceHidden ? 'hidden' : 'visible',
+      });
     });
-    this.parents = [];
-    if (this.vm) {
-      document.body.removeChild(this.popoverContainer);
-      this.vm.$destroy();
-      this.vm = null;
-    }
+  };
+}
+
+type PopoverOptions = Options & {color: string};
+
+export class Popover extends PopoverBase<PopoverOptions> {
+  protected popoverArrow = document.createElement('i');
+  protected options: PopoverOptions = {
+    reference: null,
+    render: null,
+    color: '#fff',
+  };
+
+  constructor() {
+    super();
+    this.wrapper.className = 'popover';
+    this.popoverArrow.className = 'popover-arrow';
+    this.wrapper.appendChild(this.popoverArrow);
   }
 
-  destroy() {
-    this.hide();
+  protected createVM() {
+    const { color, render } = this.options;
+    return new Vue({
+      render: (h) => {
+        return (
+          <div class="popover-content" style={{ backgroundColor: color }}>
+            {render?.(h)}
+          </div>
+        );
+      },
+    });
   }
 
-  private updatePosition() {
-    computePosition(this.reference, this.popoverContainer, {
+  protected applyOptions(options: PopoverOptions): void {
+      this.options = options;
+      this.popoverArrow.style.borderTopColor = options.color;
+  }
+
+  protected updatePosition = () => {
+    const { reference } = this.options;
+    computePosition(reference, this.wrapper, {
       placement: 'top',
       middleware: [
         offset(5),
@@ -84,7 +149,7 @@ export class Popover {
       ],
     }).then(({ x, y, middlewareData }) => {
       const { hide, arrow } = middlewareData;
-      Object.assign(this.popoverContainer.style, {
+      Object.assign(this.wrapper.style, {
         left: x + 'px',
         top: y + 'px',
         visibility: hide.referenceHidden ? 'hidden' : 'visible',
@@ -94,94 +159,5 @@ export class Popover {
         top: typeof arrow.y === 'number' ? `${arrow.y}px` : '',
       });
     });
-  }
+  };
 }
-
-export default Vue.extend({
-  data() {
-    return {
-      visible: false,
-      color: '#fff',
-      reference: undefined as unknown as HTMLElement,
-      parents: undefined as unknown as ReturnType<typeof getScrollParents>,
-    };
-  },
-  computed: {
-    contentStyle(): Record<string, string> {
-      return {
-        backgroundColor: this.color,
-      };
-    },
-    arrowStyle(): Record<string, string> {
-      return {
-        borderTopColor: this.color,
-      };
-    },
-  },
-  mounted() {
-    document.body.appendChild(this.$el as HTMLDivElement);
-  },
-  beforeDestroy() {
-    document.body.removeChild(this.$el);
-  },
-  methods: {
-    show(reference: HTMLElement, color: string) {
-      this.reference = reference;
-      this.color = color;
-      this.visible = true;
-      this.parents = [
-        ...getScrollParents(this.reference),
-        ...getScrollParents(this.$el),
-      ];
-      this.parents.forEach((el) => {
-        el.addEventListener('scroll', this.updatePosition);
-        el.addEventListener('resize', this.updatePosition);
-      });
-      this.updatePosition();
-    },
-    hide() {
-      this.visible = false;
-      if (this.parents) {
-        this.parents.forEach((el) => {
-          el.removeEventListener('scroll', this.updatePosition);
-          el.removeEventListener('resize', this.updatePosition);
-        });
-      }
-    },
-    updatePosition() {
-      const rootEl = this.$el as HTMLDivElement;
-      const arrowEl = this.$refs.arrow as HTMLElement;
-      computePosition(this.reference, rootEl, {
-        placement: 'top',
-        middleware: [
-          offset(5),
-          inline(),
-          shift({ padding: 5 }),
-          arrow({ element: arrowEl }),
-          hide(),
-        ],
-      }).then(({ x, y, middlewareData }) => {
-        const { hide, arrow } = middlewareData;
-        Object.assign(rootEl.style, {
-          left: x + 'px',
-          top: y + 'px',
-          visibility: hide.referenceHidden ? 'hidden' : 'visible',
-        });
-        Object.assign(arrowEl.style, {
-          left: typeof arrow.x === 'number' ? `${arrow.x}px` : '',
-          top: typeof arrow.y === 'number' ? `${arrow.y}px` : '',
-        });
-      });
-    },
-  },
-  render() {
-    return (
-      <div class="popover" vShow={this.visible} vOn:mouseup_stop={() => 0}>
-        <div ref="content" class="popover-content" style={this.contentStyle}>
-          {this.$slots.default}
-        </div>
-        <i ref="arrow" class="popover-arrow" style={this.arrowStyle} />
-      </div>
-    );
-  },
-});

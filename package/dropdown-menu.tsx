@@ -89,7 +89,11 @@ export default Vue.extend({
   },
   render() {
     return (
-      <div class="dropdown-menu" vShow={this.visible} vOn:mouseup_stop={()=>0}>
+      <div
+        class="dropdown-menu"
+        vShow={this.visible}
+        vOn:mouseup_stop={() => 0}
+      >
         <ul>
           {this.options.length ? (
             this.options.map((item) => (
