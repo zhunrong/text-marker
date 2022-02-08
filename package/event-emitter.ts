@@ -1,5 +1,5 @@
 export interface Listener {
-  (event?: any): void;
+  (event?: any): void; // eslint-disable-line
 }
 
 export interface Events {
@@ -31,7 +31,7 @@ export class EventEmitter {
    * @param eventName
    * @param params
    */
-  emit(eventName: string, params?: any) {
+  emit(eventName: string, params?: any) { // eslint-disable-line
     if (this.events[eventName]) {
       this.events[eventName].forEach((listener) => {
         listener(params);
