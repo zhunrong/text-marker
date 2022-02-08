@@ -68,7 +68,6 @@ export default Vue.extend({
     document.addEventListener('mouseup', this.onDocClick);
     this.$popover = new Popover();
     this.$dropdown = new PopoverBase();
-    console.log(this);
   },
   beforeDestroy() {
     if (this.$textSelection) {
