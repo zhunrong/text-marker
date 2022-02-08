@@ -9,7 +9,6 @@ import {
   arrow,
   flip,
 } from '@floating-ui/dom';
-import './popover.scss';
 
 type Options = {
   reference: Element;
@@ -26,15 +25,13 @@ export class PopoverBase<T extends Options = Options> {
     this.wrapper.onmouseup = (e) => e.stopPropagation();
     Object.assign(this.wrapper.style, {
       position: 'absolute',
+      boxShadow: '0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px 0px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)'
     });
   }
 
   protected createVM() {
-    const {render} = this.options;
     return new Vue({
-      render: (h) => {
-        return <div>{render?.(h)}</div>;
-      },
+      render: this.options.render,
     });
   }
 
@@ -113,21 +110,14 @@ export class Popover extends PopoverBase<PopoverOptions> {
 
   constructor() {
     super();
-    this.wrapper.className = 'popover';
-    this.popoverArrow.className = 'popover-arrow';
     this.wrapper.appendChild(this.popoverArrow);
-  }
-
-  protected createVM() {
-    const { color, render } = this.options;
-    return new Vue({
-      render: (h) => {
-        return (
-          <div class="popover-content" style={{ backgroundColor: color }}>
-            {render?.(h)}
-          </div>
-        );
-      },
+    Object.assign(this.popoverArrow.style, {
+      position: 'absolute',
+      display: 'block',
+      borderTop: '4px solid #607ae3',
+      borderLeft: '4px solid transparent',
+      borderRight: '4px solid transparent',
+      bottom: '-4px'
     });
   }
 

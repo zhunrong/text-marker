@@ -1,4 +1,4 @@
-.text-mark {
+.text-marker {
   position: relative;
   .paragraph {
     line-height: 24px;
@@ -34,49 +34,53 @@
   }
 }
 
-.add-mark {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  line-height: 16px;
-  height: 22px;
-  .icon-plus {
-    margin-right: 6px;
-    height: 14px;
-  }
-  &:hover {
-    opacity: 0.75;
-  }
-}
-.remove-mark {
-  display: flex;
-  align-items: center;
-  line-height: 16px;
-  height: 22px;
-  .icon-close {
-    margin-left: 6px;
+.text-marker__popover {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 22px;
+  box-sizing: border-box;
+  height: 32px;
+  border-radius: 4px;
+  background: #607ae3;
+  padding: 5px 8px;
+  white-space: nowrap;
+  .add-mark {
     cursor: pointer;
-    height: 14px;
+    display: flex;
+    align-items: center;
+    line-height: 16px;
+    height: 22px;
+    .icon-plus {
+      margin-right: 6px;
+      height: 14px;
+    }
     &:hover {
       opacity: 0.75;
     }
   }
+  .remove-mark {
+    display: flex;
+    align-items: center;
+    line-height: 16px;
+    height: 22px;
+    .icon-close {
+      margin-left: 6px;
+      cursor: pointer;
+      height: 14px;
+      &:hover {
+        opacity: 0.75;
+      }
+    }
+  }
 }
 
-.dropdown-menu {
-  position: absolute;
+.text-marker__dropdown {
   width: 180px;
   max-height: 150px;
   overflow-y: auto;
   background: rgba(255, 255, 255, 1);
-  box-shadow: 0px 9px 28px 8px rgba(0, 0, 0, 0.05),
-    0px 6px 16px 0px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12);
   border-radius: 4px;
-  z-index: 9999;
-  &[data-popper-reference-hidden] {
-    visibility: hidden;
-    pointer-events: none;
-  }
   ul {
     margin: 0;
     padding: 4px 0;

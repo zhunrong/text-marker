@@ -88,9 +88,11 @@ export default Vue.extend({
           color,
           render: () => {
             return (
-              <div class="add-mark" vOn:click={this.addMark}>
-                <plus-icon />
-                添加标注
+              <div class="text-marker__popover" style={{ background: color }}>
+                <div class="add-mark" vOn:click={this.addMark}>
+                  <plus-icon />
+                  添加标注
+                </div>
               </div>
             );
           },
@@ -119,9 +121,11 @@ export default Vue.extend({
           color,
           render: () => {
             return (
-              <div class="remove-mark">
-                {this.popoverText}
-                <close-icon vOn:click_native={this.removeMark} />
+              <div class="text-marker__popover" style={{ background: color }}>
+                <div class="remove-mark">
+                  {this.popoverText}
+                  <close-icon vOn:click_native={this.removeMark} />
+                </div>
               </div>
             );
           },
@@ -159,7 +163,7 @@ export default Vue.extend({
         reference: this.textSelection.getRangeElement(this.range),
         render: () => {
           return (
-            <div class="dropdown-menu">
+            <div class="text-marker__dropdown">
               <ul>
                 {this.options.length ? (
                   this.options.map((item) => (
@@ -202,7 +206,7 @@ export default Vue.extend({
   },
   render() {
     return (
-      <div class="text-mark">
+      <div class="text-marker">
         <p ref="paragraph" class="paragraph"></p>
       </div>
     );

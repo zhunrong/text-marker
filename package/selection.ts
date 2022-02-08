@@ -1,5 +1,6 @@
-import EventEmitter from './eventEmitter';
+import EventEmitter from './event-emitter';
 
+// eslint-disable-next-line
 function isSpan(node: any): node is HTMLSpanElement {
   return node && node.nodeType === 1 && node.nodeName === 'SPAN';
 }
@@ -191,9 +192,7 @@ class TextSelection extends EventEmitter {
   /**
    * 根据range索引获取边界盒
    */
-  getRangeBBox(range: TextRange): DOMRect | null;
-  getRangeBBox(index: number): DOMRect | null;
-  getRangeBBox(param: any) {
+  getRangeBBox(param: TextRange | number) {
     let index = -1;
     if (typeof param === 'number') {
       index = param;
@@ -223,9 +222,7 @@ class TextSelection extends EventEmitter {
    * 获取range相对于容器的位置
    * @param range
    */
-  getRangePosition(range: TextRange): Position | null;
-  getRangePosition(index: number): Position | null;
-  getRangePosition(param: any) {
+  getRangePosition(param: TextRange | number) {
     const rangeBbox = this.getRangeBBox(param);
     if (!rangeBbox) return null;
     const bbox = this.getBBox();
