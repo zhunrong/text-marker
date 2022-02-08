@@ -13,6 +13,7 @@ npm install -S @chenzr/text-marker
 ```js
 import Vue from "vue";
 import TextMarker from "@chenzr/text-marker";
+import "@chenzr/text-marker/libs/text-marker.css";
 
 Vue.use(TextMarker);
 ```
@@ -28,6 +29,7 @@ Vue.use(TextMarker);
 
 <script>
 import TextMarker from "@chenzr/text-marker";
+import "@chenzr/text-marker/libs/text-marker.css";
 
 export default {
   components: {
@@ -48,6 +50,7 @@ export default {
 
 <script>
 import TextMarker from "@chenzr/text-marker";
+import "@chenzr/text-marker/libs/text-marker.css";
 
 export default {
   components: {
