@@ -9,14 +9,4 @@ module.exports = (webpackConf, type) => {
       publicPath: '/text-marker/',
     });
   }
-  if (type === 'dev') {
-    Object.assign(webpackConf.devServer, {
-      client: {
-        overlay: {
-          errors: true,
-          warnings: false,
-        },
-      },
-    });
-  }
 };

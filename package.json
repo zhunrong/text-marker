@@ -25,8 +25,11 @@
   "dependencies": {
     "@floating-ui/dom": "^0.2.0"
   },
+  "peerDependencies": {
+    "@floating-ui/dom": "^0.2.0"
+  },
   "devDependencies": {
     "@chenzr/scroll-view": "0.1.1",
-    "@chenzr/vue-scaffold": "0.4.2"
+    "@chenzr/vue-scaffold": "0.5.0"
   }
 }
