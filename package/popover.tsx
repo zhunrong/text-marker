@@ -24,6 +24,8 @@ export class PopoverBase<T extends Options = Options> {
   constructor() {
     this.wrapper.onmouseup = (e) => e.stopPropagation();
     Object.assign(this.wrapper.style, {
+      left: 0,
+      top: 0,
       position: 'absolute',
       boxShadow: '0px 9px 28px 8px rgba(0, 0, 0, 0.05), 0px 6px 16px 0px rgba(0, 0, 0, 0.08), 0px 3px 6px -4px rgba(0, 0, 0, 0.12)'
     });
@@ -42,24 +44,28 @@ export class PopoverBase<T extends Options = Options> {
       ...getScrollParents(this.wrapper),
     ];
     this.parents.forEach((el) => {
-      el.addEventListener('scroll', this.updatePosition);
-      el.addEventListener('resize', this.updatePosition);
+      el.addEventListener('scroll', this.updateByParent);
+      el.addEventListener('resize', this.updateByParent);
     });
   }
 
   protected unobserveParents() {
     while (this.parents.length) {
       const el = this.parents.pop();
-      el.removeEventListener('scroll', this.updatePosition);
-      el.removeEventListener('resize', this.updatePosition);
+      el.removeEventListener('scroll', this.updateByParent);
+      el.removeEventListener('resize', this.updateByParent);
     }
   }
+
+  protected updateByParent = () => {
+    this.updatePosition(false);
+  };
 
   protected applyOptions(options: T) {
     this.options = options;
   }
 
-  show(options: T) {
+  public show(options: T) {
     if (this.vm) {
       this.hide();
     }
@@ -70,10 +76,10 @@ export class PopoverBase<T extends Options = Options> {
     document.body.appendChild(this.wrapper);
     this.vm.$mount(vmRoot);
     this.observeParents();
-    this.updatePosition();
+    this.updatePosition(true);
   }
 
-  hide() {
+  public hide() {
     if (!this.vm) return;
     this.unobserveParents();
     this.vm.$destroy();
@@ -82,20 +88,38 @@ export class PopoverBase<T extends Options = Options> {
     this.vm = null;
   }
 
-  protected updatePosition = ()=> {
+  public destroy() {
+    this.hide();
+  }
+
+  protected updatePosition (animate: boolean) {
     const { reference } = this.options;
     computePosition(reference, this.wrapper, {
       placement: 'bottom-start',
       middleware: [inline(), flip(), hide()],
     }).then(({ x, y, middlewareData }) => {
       const { hide } = middlewareData;
-      Object.assign(this.wrapper.style, {
-        left: x + 'px',
-        top: y + 'px',
-        visibility: hide.referenceHidden ? 'hidden' : 'visible',
-      });
+      if (animate) {
+        Object.assign(this.wrapper.style, {
+          transition: '',
+          transform: `translate3d(${x}px,${y + 10}px,0)`,
+          visibility: hide.referenceHidden ? 'hidden' : 'visible',
+        });
+        requestAnimationFrame(()=>{
+          Object.assign(this.wrapper.style, {
+            transition: 'transform 0.2s',
+            transform: `translate3d(${x}px,${y}px,0)`,
+          });
+        });
+      } else {
+        Object.assign(this.wrapper.style, {
+          transition: '',
+          transform: `translate3d(${x}px,${y}px,0)`,
+          visibility: hide.referenceHidden ? 'hidden' : 'visible',
+        });
+      }
     });
-  };
+  }
 }
 
 type PopoverOptions = Options & {color: string};
@@ -126,7 +150,7 @@ export class Popover extends PopoverBase<PopoverOptions> {
       this.popoverArrow.style.borderTopColor = options.color;
   }
 
-  protected updatePosition = () => {
+  protected updatePosition(animate:boolean) {
     const { reference } = this.options;
     computePosition(reference, this.wrapper, {
       placement: 'top',
@@ -139,15 +163,29 @@ export class Popover extends PopoverBase<PopoverOptions> {
       ],
     }).then(({ x, y, middlewareData }) => {
       const { hide, arrow } = middlewareData;
-      Object.assign(this.wrapper.style, {
-        left: x + 'px',
-        top: y + 'px',
-        visibility: hide.referenceHidden ? 'hidden' : 'visible',
-      });
       Object.assign(this.popoverArrow.style, {
         left: typeof arrow.x === 'number' ? `${arrow.x}px` : '',
         top: typeof arrow.y === 'number' ? `${arrow.y}px` : '',
       });
+      if (animate) {
+        Object.assign(this.wrapper.style, {
+          transition: '',
+          visibility: hide.referenceHidden ? 'hidden' : 'visible',
+          transform: `translate3d(${x}px,${y + 10}px,0)`,
+        });
+        requestAnimationFrame(()=>{
+          Object.assign(this.wrapper.style, {
+            transition: 'transform 0.2s',
+            transform: `translate3d(${x}px,${y}px,0)`,
+          });
+        });
+      } else {
+        Object.assign(this.wrapper.style, {
+          transform: `translate3d(${x}px,${y}px,0)`,
+          visibility: hide.referenceHidden ? 'hidden' : 'visible',
+          transition: ''
+        });
+      }
     });
-  };
+  }
 }

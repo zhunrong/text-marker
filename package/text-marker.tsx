@@ -43,8 +43,8 @@ export default Vue.extend({
       popoverText: '',
       range: undefined as unknown as TextRange | null,
       textSelection: undefined as unknown as TextSelection,
-      popover: new Popover(),
-      dropdown: new PopoverBase(),
+      popover: undefined as unknown as Popover,
+      dropdown: undefined as unknown as PopoverBase,
     };
   },
   watch: {
@@ -61,11 +61,15 @@ export default Vue.extend({
     this.textSelection.init(this.rawText, this.ranges);
     this.textSelection.on('range:insert', this.onRangeInsert);
     this.textSelection.on('range:click', this.onRangeClick);
+    this.popover = new Popover();
+    this.dropdown = new PopoverBase();
     document.addEventListener('mouseup', this.onDocClick);
   },
   beforeDestroy() {
     if (this.textSelection) {
       this.textSelection.destroy();
+      this.popover.destroy();
+      this.dropdown.destroy();
     }
     document.removeEventListener('mouseup', this.onDocClick);
   },
